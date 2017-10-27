@@ -5,8 +5,10 @@ def read_grammar_defs(filename)
   filename = 'grammars/' + filename unless filename.start_with? 'grammars/'
   filename += '.g' unless filename.end_with? '.g'
   contents = open(filename, 'r') { |f| f.read }
+
   contents.scan(/\{(.+?)\}/m).map do |rule_array|
     rule_array[0]
+
   end
 end
 
@@ -35,6 +37,13 @@ end
 # returns {"<start>"=>[["The", "<object>", "<verb>", "tonight."]], "<object>"=>[["waves"], ["big", "yellow", "flowers"], ["slugs"]], "<verb>"=>[["sigh", "<adverb>"], ["portend", "like", "<object>"], ["die", "<adverb>"]], "<adverb>"=>[["warily"], ["grumpily"]]}
 def to_grammar_hash(split_def_array)
   # TODO: your implementation here
+
+  # arr.first has the first element
+  # a.drop remove the first element in the old array then 
+  # create new array without the first element
+  # .t_h to hash the array then join them [sub-array] together
+  split_def_array.map { |arr| [arr.first,  a.drop(1)] }.to_h.join(", ")  
+ 
 end
 
 # Returns true iff s is a non-terminal
@@ -42,6 +51,8 @@ end
 #        and the last character is >
 def is_non_terminal?(s)
   # TODO: your implementation here
+  s[0] == "<" && s[-1] == ">"
+  
 end
 
 # Given a grammar hash (as returned by to_grammar_hash)
@@ -76,4 +87,7 @@ if __FILE__ == $0
   # TODO: your implementation of the following
   # prompt the user for the name of a grammar file
   # rsg that file
+  puts "enter file name: "
+  file_name = gets.chomp
+  rsg(file_name)
 end
