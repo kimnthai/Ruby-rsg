@@ -23,7 +23,8 @@ end
 #   split_definition "\n<start>\nYou <adj> <name> . ;\n;\n"
 #     returns ["<start>", "You <adj> <name> .", ""]
 def split_definition(raw_def)
-  # TODO: your implementation here
+  raw_def[0] = ''
+  raw_def.split(/\s*;*\n/)
 end
 
 # Takes an array of definitions where the definitions have been
@@ -37,6 +38,7 @@ end
 # returns {"<start>"=>[["The", "<object>", "<verb>", "tonight."]], "<object>"=>[["waves"], ["big", "yellow", "flowers"], ["slugs"]], "<verb>"=>[["sigh", "<adverb>"], ["portend", "like", "<object>"], ["die", "<adverb>"]], "<adverb>"=>[["warily"], ["grumpily"]]}
 def to_grammar_hash(split_def_array)
   # TODO: your implementation here
+  
 
   # arr.first has the first element
   # a.drop remove the first element in the old array then 
