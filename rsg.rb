@@ -1,9 +1,3 @@
-=begin
-def rsg()
-
-end
-=end
-
 # Extracts just the definitions from the grammar file
 # Returns an array of strings where each string is the lines for
 # a given definition (without the braces)
@@ -11,16 +5,12 @@ def read_grammar_defs(filename)
   filename = 'grammars/' + filename unless filename.start_with? 'grammars/'
   filename += '.g' unless filename.end_with? '.g'
   contents = open(filename, 'r') { |f| f.read }
+
   contents.scan(/\{(.+?)\}/m).map do |rule_array|
     rule_array[0]
+
   end
 end
-
-
-
-arr = read_grammar_defs("Poem")
-
-
 
 # Takes data as returned by read_grammar_defs and reformats it
 # in the form of an array with the first element being the
@@ -32,23 +22,9 @@ arr = read_grammar_defs("Poem")
 #     returns ["<start>", "You <adj> <name> .", "May <curse> ."]
 #   split_definition "\n<start>\nYou <adj> <name> . ;\n;\n"
 #     returns ["<start>", "You <adj> <name> .", ""]
-
-###old: raw_def.split(/\n/)[1..-1].map{|a| a.chomp(";").chomp(' ')}
-###"\n<start>\nYou <adj> <name> . ;\nMay <curse> . ;\n".split(/ *;*\n/)[1..-1]
-######str.split(/\n{1}/)[1..-1].map{|a| a.gsub(/\s+/,' ')}
-#####str.split(/\n{1}/)[1..-1].map{|a| a.gsub(/\s+/,' ').gsub(/\s*;/, '')}
 def split_definition(raw_def)
   raw_def.split(/\s*\n{1}/)[1..-1].map{|a| a.gsub(/\s+/,' ').gsub(/\s*;/, '')}
 end
-new_arr = arr.map{|s| split_definition s}
-#s = new_arr[1]
-#puts s
-
-#.split(/\n{1}/)[1..-1]
-#puts split_definition arr[1]
-#puts s[1]
-#puts s[1].length
-
 
 # Takes an array of definitions where the definitions have been
 # processed by split_definition and returns a Hash that
@@ -60,31 +36,15 @@ new_arr = arr.map{|s| split_definition s}
 # to_grammar_hash([["<start>", "The   <object>   <verb>   tonight."], ["<object>", "waves", "big    yellow       flowers", "slugs"], ["<verb>", "sigh <adverb>", "portend like <object>", "die <adverb>"], ["<adverb>", "warily", "grumpily"]])
 # returns {"<start>"=>[["The", "<object>", "<verb>", "tonight."]], "<object>"=>[["waves"], ["big", "yellow", "flowers"], ["slugs"]], "<verb>"=>[["sigh", "<adverb>"], ["portend", "like", "<object>"], ["die", "<adverb>"]], "<adverb>"=>[["warily"], ["grumpily"]]}
 def to_grammar_hash(split_def_array)
-  # TODO: your implementation here
-  h = Hash.new
-  split_def_array.each{|v| h[v[0]] = v[1..-1].map{|g| g.split(/\s/)}}
-  return h
-  #split_def_array.map{|v| {v[0]=> [v[1..-1]]}}
-
-
-  #{ split_def_array.each{|v| v[0]=> [v[1..-1]] } }
-  #split_def_array.each{|v| {v[0]=> [v[1..-1]]}}
-
-  #v[1..-1].split(/\s/)
+  split_def_array.map{|x| x.map.with_index {|x,i| (i > 0)? x.split(/\s/): x}}.map!{|x| [x[0],x[1..-1]]}.to_h
 end
-s = to_grammar_hash new_arr
-puts s
-=begin
->> {new_arr[0]=> [new_arr[1..-1]]}
-=> {"<object>"=>[["waves", "big yellow flowers", "slugs"]]}
-=end
-
 
 # Returns true iff s is a non-terminal
 # a.k.a. a string where the first character is <
 #        and the last character is >
 def is_non_terminal?(s)
   # TODO: your implementation here
+  s[0] == "<" && s[-1] == ">"
 end
 
 # Given a grammar hash (as returned by to_grammar_hash)
@@ -106,17 +66,36 @@ end
 # case-insensitively, <NOUN> matches <Noun> and <noun>, for example.
 def expand(grammar, non_term="<start>")
   # TODO: your implementation here
+  s = ""
+  arr = grammar.fetch(non_term, []).sample      #Choose a random element from the array.
+
+  if arr != nil
+    arr.each do |x|
+      if !is_non_terminal?(x)
+        s = s + x + " "
+      elsif is_non_terminal?(x)
+        s = s + expand(grammar, x)
+      end
+    end
+  end
+  s.gsub(/\s(?=\.)|\s(?=,)|\s(?=\^)|(?<=\^)\s|\s(?=\?)|\s(?=!)|(?<=\()\s|\s(?=\))|\s(?=:)/, '')
 end
 
 # Given the name of a grammar file,
 # read the grammar file and print a
 # random expansion of the grammar
 def rsg(filename)
-  # TODO: your implementation here
+  #TODO
 end
+
+
 
 if __FILE__ == $0
   # TODO: your implementation of the following
   # prompt the user for the name of a grammar file
   # rsg that file
+  puts "enter file name: "
+  file_name = gets.chomp.strip
+  rsg(file_name); 
 end
+
